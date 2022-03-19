@@ -16,53 +16,45 @@ var allConfigs = Config{
 	NoCustom:        true,
 }
 
-func Test_buildParams(t *testing.T) {
-	type args struct {
-		cfg Config
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			name: "all params",
-			args: args{
-				cfg: allConfigs,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := buildParams(tt.args.cfg); got != tt.want {
-				t.Errorf("buildParams() = %v, want %v", got, tt.want)
-
-			}
-		})
-	}
-}
-
-func TestNew(t *testing.T) {
-	type args struct {
+func Test_dmenu_Build(t *testing.T) {
+	type fields struct {
 		config Config
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name   string
+		fields fields
+		want   []string
 	}{
 		{
-			name: "all config params",
-			args: args{
+			name: "set all",
+			fields: fields{
 				config: allConfigs,
 			},
-			want: "-dmenu -sep '|' -p 'select' -l 2 -i -a '2:4' -u '1:2' -only-match -no-custom ",
+			want: []string{
+				"-dmenu",
+				"-sep",
+				"|",
+				"-p",
+				"select",
+				"-l",
+				"2",
+				"-i",
+				"-a",
+				"2:4",
+				"-u",
+				"1:2",
+				"-only-match",
+				"-no-custom",
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := New(tt.args.config); !reflect.DeepEqual(got.Build(), tt.want) {
-				t.Errorf("New() = %v, want %v", got.Build(), tt.want)
+			d := &dmenu{
+				config: tt.fields.config,
+			}
+			if got := d.Build(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("dmenu.Build() = \n%v, want \n%v", got, tt.want)
 			}
 		})
 	}

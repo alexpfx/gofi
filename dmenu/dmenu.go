@@ -2,7 +2,6 @@ package dmenu
 
 import (
 	"fmt"
-	"strings"
 )
 
 func New(config Config) DMenu {
@@ -12,7 +11,7 @@ func New(config Config) DMenu {
 }
 
 type DMenu interface {
-	Build() string
+	Build() []string
 }
 
 type Config struct {
@@ -30,39 +29,42 @@ type dmenu struct {
 	config Config
 }
 
-func (d *dmenu) Build() string {
-	return fmt.Sprint("-dmenu ", buildParams(d.config))
+func (d *dmenu) Build() []string {
+	return append([]string{"-dmenu"}, buildParams(d.config)...)
 }
 
-func buildParams(cfg Config) string {
-	sb := &strings.Builder{}
+func buildParams(cfg Config) []string {
+	argArray := make([]string, 0)
 
-	sb = add(sb, "-sep", cfg.Sep)
-	sb = add(sb, "-p", cfg.Prompt)
-	sb = add(sb, "-l", cfg.Lines)
-	sb = add(sb, "-i", cfg.InsensitiveCase)
-	sb = add(sb, "-a", cfg.Active)
-	sb = add(sb, "-u", cfg.Urgent)
-	sb = add(sb, "-only-match", cfg.OnlyMatch)
-	sb = add(sb, "-no-custom", cfg.NoCustom)
+	argArray = add(argArray, "-sep", cfg.Sep)
+	argArray = add(argArray, "-p", cfg.Prompt)
+	argArray = add(argArray, "-l", cfg.Lines)
+	argArray = add(argArray, "-i", cfg.InsensitiveCase)
+	argArray = add(argArray, "-a", cfg.Active)
+	argArray = add(argArray, "-u", cfg.Urgent)
+	argArray = add(argArray, "-only-match", cfg.OnlyMatch)
+	argArray = add(argArray, "-no-custom", cfg.NoCustom)
+	return argArray
 
-	return sb.String()
 }
 
-func add(sb *strings.Builder, arg string, value interface{}) *strings.Builder {
-	if value == nil {
-		return sb
-	}
-	_, ok := value.(bool)
+func add(argList []string, arg string, value interface{}) []string {
+	bp, ok := value.(bool)
 	if ok {
-		sb.WriteString(arg + " ")
-		return sb
+		if bp {
+			return append(argList, arg)
+		}
+		return argList
 	}
-	_, ok = value.(string)
-	if ok {
-		sb.WriteString(fmt.Sprintf("%s '%s' ", arg, value))
-		return sb
+
+	st, ok := value.(string)
+	argList = append(argList, arg)
+	if ok && st != "" {
+		argList = append(argList, fmt.Sprintf("%s", st))
+		return argList
 	}
-	sb.WriteString(fmt.Sprintf("%s %v ", arg, value))
-	return sb
+
+	argList = append(argList, fmt.Sprintf("%v", value))
+
+	return argList
 }
