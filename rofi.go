@@ -8,8 +8,6 @@ import (
 const rofi = "rofi"
 
 func CallRofi(input string, args []string) (string, error) {
-	fmt.Println(input)
-	fmt.Println(args)
 	cmd := exec.Command(rofi, args...)
 	in, err := cmd.StdinPipe()
 	if err != nil {
@@ -17,7 +15,7 @@ func CallRofi(input string, args []string) (string, error) {
 	}
 
 	go func() {
-		fmt.Fprintln(in, input)
+		fmt.Fprint(in, input)
 		defer in.Close()
 	}()
 
