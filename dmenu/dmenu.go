@@ -1,7 +1,7 @@
 package dmenu
 
 import (
-	"fmt"
+	"github.com/alexpfx/gofi"
 )
 
 func New(config Config) DMenu {
@@ -36,35 +36,14 @@ func (d *dmenu) Build() []string {
 func buildParams(cfg Config) []string {
 	argArray := make([]string, 0)
 
-	argArray = add(argArray, "-sep", cfg.Sep)
-	argArray = add(argArray, "-p", cfg.Prompt)
-	argArray = add(argArray, "-l", cfg.Lines)
-	argArray = add(argArray, "-i", cfg.InsensitiveCase)
-	argArray = add(argArray, "-a", cfg.Active)
-	argArray = add(argArray, "-u", cfg.Urgent)
-	argArray = add(argArray, "-only-match", cfg.OnlyMatch)
-	argArray = add(argArray, "-no-custom", cfg.NoCustom)
+	argArray = gofi.Add(argArray, "-sep", cfg.Sep)
+	argArray = gofi.Add(argArray, "-p", cfg.Prompt)
+	argArray = gofi.Add(argArray, "-l", cfg.Lines)
+	argArray = gofi.Add(argArray, "-i", cfg.InsensitiveCase)
+	argArray = gofi.Add(argArray, "-a", cfg.Active)
+	argArray = gofi.Add(argArray, "-u", cfg.Urgent)
+	argArray = gofi.Add(argArray, "-only-match", cfg.OnlyMatch)
+	argArray = gofi.Add(argArray, "-no-custom", cfg.NoCustom)
 	return argArray
 
-}
-
-func add(argList []string, arg string, value interface{}) []string {
-	bp, ok := value.(bool)
-	if ok {
-		if bp {
-			return append(argList, arg)
-		}
-		return argList
-	}
-
-	st, ok := value.(string)
-	argList = append(argList, arg)
-	if ok && st != "" {
-		argList = append(argList, fmt.Sprintf("%s", st))
-		return argList
-	}
-
-	argList = append(argList, fmt.Sprintf("%v", value))
-
-	return argList
 }
